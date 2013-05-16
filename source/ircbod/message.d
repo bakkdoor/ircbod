@@ -5,11 +5,20 @@ import ircbod.client;
 
 struct IRCMessage
 {
-    string     text;
-    string     nickname;
-    string     channel;
-    DateTime   time;
-    IRCClient  client;
+    enum Type {
+        CHAN_MESSAGE,
+        PRIV_MESSAGE,
+        JOIN,
+        PART,
+        QUIT
+    }
+
+    Type        type;
+    string      text;
+    string      nickname;
+    string      channel;
+    DateTime    time;
+    IRCClient   client;
 
     void reply(string message)
     {

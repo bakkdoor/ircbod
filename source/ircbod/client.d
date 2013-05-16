@@ -6,13 +6,6 @@ import std.regex, std.container, std.datetime, std.conv;
 alias void delegate(IRCMessage message)                 MessageHandler;
 alias void delegate(IRCMessage message, string[] args)  MessageHandlerWithArgs;
 
-enum MessageType {
-    MESSAGE,
-    JOIN,
-    PART,
-    QUIT
-}
-
 class IRCClient
 {
 private:
@@ -26,7 +19,7 @@ private:
     string                                      nickname;
     string                                      password;
     string[]                                    channels;
-    DList!PatternMessageHandler[MessageType]    handlers;
+    DList!PatternMessageHandler[IRCMessage.Type]    handlers;
 
     static Regex!char MATCHALL = regex(".*");
 
@@ -74,27 +67,27 @@ public:
         this.sock.reconnect();
     }
 
-    void on(MessageType type, MessageHandler callback)
+    void on(IRCMessage.Type type, MessageHandler callback)
     {
         on(type, MATCHALL, callback);
     }
 
-    void on(MessageType type, MessageHandlerWithArgs callback)
+    void on(IRCMessage.Type type, MessageHandlerWithArgs callback)
     {
         on(type, MATCHALL, callback);
     }
 
-    void on(MessageType type, string pattern, MessageHandler callback)
+    void on(IRCMessage.Type type, string pattern, MessageHandler callback)
     {
         on(type, regex(pattern), callback);
     }
 
-    void on(MessageType type, string pattern, MessageHandlerWithArgs callback)
+    void on(IRCMessage.Type type, string pattern, MessageHandlerWithArgs callback)
     {
         on(type, regex(pattern), callback);
     }
 
-    void on(MessageType type, Regex!char regex, MessageHandler callback)
+    void on(IRCMessage.Type type, Regex!char regex, MessageHandler callback)
     {
         PatternMessageHandler handler = { callback, null, regex };
         if(type !in this.handlers) {
@@ -104,7 +97,7 @@ public:
         }
     }
 
-    void on(MessageType type, Regex!char regex, MessageHandlerWithArgs callback)
+    void on(IRCMessage.Type type, Regex!char regex, MessageHandlerWithArgs callback)
     {
         PatternMessageHandler handler = { null, callback, regex };
         if(type !in this.handlers) {
@@ -141,18 +134,18 @@ public:
 
 private:
 
-    MessageType typeForString(string typeStr)
+    IRCMessage.Type typeForString(string typeStr)
     {
-        MessageType type;
+        IRCMessage.Type type;
         switch(typeStr) {
             case "JOIN":
-                return MessageType.JOIN;
+                return IRCMessage.Type.JOIN;
             case "PART":
-                return MessageType.PART;
+                return IRCMessage.Type.PART;
             case "QUIT":
-                return MessageType.QUIT;
+                return IRCMessage.Type.QUIT;
             default:
-                return MessageType.MESSAGE;
+                return IRCMessage.Type.CHAN_MESSAGE;
         }
     }
 
@@ -163,7 +156,9 @@ private:
             auto typeStr = matcher.captures[2];
             auto channel = matcher.captures[3];
             auto time    = to!DateTime(Clock.currTime());
+            auto type    = typeForString(typeStr);
             IRCMessage ircMessage = {
+                type,
                 typeStr,
                 user,
                 channel,
@@ -171,7 +166,7 @@ private:
                 this
             };
 
-            return handleMessage(typeForString(typeStr), ircMessage);
+            return handleMessage(ircMessage);
         }
 
         if (auto matcher = match(message, r"^:(\S+)\!\S+ PRIVMSG (\S+) :(.*)$")) {
@@ -179,7 +174,9 @@ private:
             auto channel = matcher.captures[2];
             auto text    = matcher.captures[3];
             auto time    = to!DateTime(Clock.currTime());
+            auto type    = channel[0] == '#' ? IRCMessage.Type.CHAN_MESSAGE : IRCMessage.Type.PRIV_MESSAGE;
             IRCMessage ircMessage = {
+                type,
                 text,
                 user,
                 channel,
@@ -187,7 +184,7 @@ private:
                 this
             };
 
-            return handleMessage(MessageType.MESSAGE, ircMessage);
+            return handleMessage(ircMessage);
         }
 
         if (auto matcher = match(message, r"^PING (.+)$")) {
@@ -196,10 +193,10 @@ private:
         }
     }
 
-    void handleMessage(MessageType type, IRCMessage message)
+    void handleMessage(IRCMessage message)
     {
-        if(type in this.handlers) {
-            foreach(PatternMessageHandler h; this.handlers[type]) {
+        if(message.type in this.handlers) {
+            foreach(PatternMessageHandler h; this.handlers[message.type]) {
                 if(auto matcher = match(message.text, h.pattern)) {
                     string[] args = [];
                     foreach(string m; matcher.captures) {
