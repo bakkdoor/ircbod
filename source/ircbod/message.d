@@ -22,10 +22,10 @@ struct IRCMessage
 
     void reply(string message)
     {
-        if(this.type == Type.PRIV_MESSAGE) {
-            this.client.sendMessageToUser(message, this.nickname);
+        if(type == Type.PRIV_MESSAGE) {
+            client.sendMessageToUser(message, nickname);
         } else {
-            this.client.sendMessageToChannel(message, this.channel);
+            client.sendMessageToChannel(message, channel);
         }
     }
 }
