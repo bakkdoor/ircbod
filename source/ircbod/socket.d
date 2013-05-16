@@ -129,7 +129,17 @@ public:
     void names(string[] channels)
     {
         if(channels.length > 0)
+            write("NAMES " ~ std.array.join(channels, ","));
+        else
+            write("NAMES");
+    }
+
+    void list(string[] channels)
+    {
+        if(channels.length > 0)
             write("LIST " ~ std.array.join(channels, ","));
+        else
+            write("LIST");
     }
 
     void invite(string nickname, string channel)
@@ -137,11 +147,64 @@ public:
         write("INVITE " ~ nickname ~ " " ~ channel);
     }
 
-    // ...
+    void kick(string channel, string nickname, string comment = null)
+    {
+        raw(["KICK", channel, nickname, comment]);
+    }
 
     void privmsg(string target, string message)
     {
         write("PRIVMSG " ~ target ~ " :" ~ message);
+    }
+
+    void notice(string target, string message)
+    {
+        write("NOTICE " ~ target ~ " :" ~ message);
+    }
+
+    void motd(string target = null)
+    {
+        writeOptional("MOTD", [target]);
+    }
+
+    void stats(string[] params)
+    {
+        writeOptional("STATS", params);
+    }
+
+    void time(string target = null)
+    {
+        writeOptional("TIME", [target]);
+    }
+
+    void info(string target = null)
+    {
+        writeOptional("INFO", [target]);
+    }
+
+    void squery(string target, string message)
+    {
+        write("SQUERY " ~ target ~ " :" ~ message);
+    }
+
+    void who(string[] params)
+    {
+        writeOptional("WHO", params);
+    }
+
+    void whois(string[] params)
+    {
+        writeOptional("WHOIS", params);
+    }
+
+    void whowas(string[] params)
+    {
+        writeOptional("WHOWAS", params);
+    }
+
+    void kill(string user, string message)
+    {
+        write("KILL " ~ user ~ " :" ~ message);
     }
 
     void ping(string server)
@@ -152,5 +215,20 @@ public:
     void pong(string server)
     {
         write("PONG " ~ server);
+    }
+
+    void away(string message = null)
+    {
+        raw(["AWAY", message]);
+    }
+
+    void users(string target = null)
+    {
+        writeOptional("USERS", [target]);
+    }
+
+    void userhost(string[] users)
+    {
+        write("USERHOST" ~ std.array.join(users, " "));
     }
 }
