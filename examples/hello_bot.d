@@ -1,4 +1,3 @@
-#!/usr/bin/env rdmd
 module main;
 
 import std.stdio;
