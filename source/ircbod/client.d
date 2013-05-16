@@ -15,11 +15,13 @@ private:
         Regex!char              pattern;
     }
 
-    IRCSocket                                   sock;
-    string                                      nickname;
-    string                                      password;
-    string[]                                    channels;
-    DList!PatternMessageHandler[IRCMessage.Type]    handlers;
+    alias DList!PatternMessageHandler HandlerList;
+
+    IRCSocket                       sock;
+    string                          nickname;
+    string                          password;
+    string[]                        channels;
+    HandlerList[IRCMessage.Type]    handlers;
 
     static Regex!char MATCHALL = regex(".*");
 
@@ -91,7 +93,7 @@ public:
     {
         PatternMessageHandler handler = { callback, null, regex };
         if(type !in this.handlers) {
-            this.handlers[type] = DList!PatternMessageHandler([handler]);
+            this.handlers[type] = HandlerList([handler]);
         } else {
             this.handlers[type].insertBack(handler);
         }
@@ -101,7 +103,7 @@ public:
     {
         PatternMessageHandler handler = { null, callback, regex };
         if(type !in this.handlers) {
-            this.handlers[type] = DList!PatternMessageHandler([handler]);
+            this.handlers[type] = HandlerList([handler]);
         } else {
             this.handlers[type].insertBack(handler);
         }
