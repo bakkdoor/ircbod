@@ -22,10 +22,10 @@ struct IRCMessage
 
     void reply(string message)
     {
-        if(this.channel[0] == '#') {
-            this.client.sendMessageToChannel(message, this.channel);
-        } else {
+        if(this.type == Type.PRIV_MESSAGE) {
             this.client.sendMessageToUser(message, this.nickname);
+        } else {
+            this.client.sendMessageToChannel(message, this.channel);
         }
     }
 }
