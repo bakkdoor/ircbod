@@ -61,6 +61,11 @@ public:
         }
     }
 
+    bool connected()
+    {
+        return this.sock.connected();
+    }
+
     void disconnect()
     {
         this.sock.disconnect();
@@ -126,16 +131,16 @@ public:
 
     void run()
     {
-        if(!this.sock.connected())
+        if(!connected())
             connect();
+
+        scope(exit) disconnect();
 
         string line;
         while (this.running && (line = this.sock.read()).length > 0) {
             std.stdio.writeln(line);
             processLine(line);
         }
-
-        this.sock.disconnect();
     }
 
     bool isRunning()
