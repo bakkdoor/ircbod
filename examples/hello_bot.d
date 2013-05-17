@@ -27,4 +27,3 @@ void main(string[] args)
 
     bot.run();
 }
-
