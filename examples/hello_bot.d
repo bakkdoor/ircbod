@@ -7,8 +7,14 @@ void main(string[] args)
 {
     IRCClient bot = new IRCClient("irc.freenode.net", 6667, "ircbod", null, ["#ircbod"]);
 
-    bot.on(IRCMessage.Type.PRIV_MESSAGE, r"^hello (\S+)$", (msg, args) {
+    bot.on(IRCMessage.Type.MESSAGE, r"^hello (\S+)$", (msg, args) {
         msg.reply("Hello to you, too " ~ msg.nickname ~ "! You greeted: " ~ args[0]);
+    });
+
+    bot.on(IRCMessage.Type.PRIV_MESSAGE, r"^!quit$", (msg) {
+        msg.reply("Yes, master.");
+        bot.broadcast("My master told me to quit. Bye!");
+        bot.quit();
     });
 
     bot.on(IRCMessage.Type.JOIN, (msg) {
