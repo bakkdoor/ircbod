@@ -1,4 +1,4 @@
-module main;
+module hello_bot;
 
 import std.stdio;
 import ircbod.client, ircbod.message;
@@ -18,11 +18,11 @@ void main(string[] args)
     });
 
     bot.on(IRCMessage.Type.CHAN_MESSAGE, (msg) {
-        writeln("got chan message: " ~ msg.text);
+        writeln("got chan message: ", msg.text);
     });
 
     bot.on(IRCMessage.Type.PRIV_MESSAGE, (msg) {
-        writeln("got private message: " ~ msg.text);
+        writeln("got private message: ", msg.text);
     });
 
     bot.run();
