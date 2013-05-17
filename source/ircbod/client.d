@@ -73,7 +73,8 @@ public:
 
     void reconnect()
     {
-        this.sock.reconnect();
+        disconnect();
+        connect();
     }
 
     void on(IRCMessage.Type type, MessageHandler callback)
