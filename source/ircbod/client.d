@@ -93,6 +93,12 @@ public:
 
     void on(IRCMessage.Type type, Regex!char regex, MessageHandler callback)
     {
+        if(type == IRCMessage.Type.MESSAGE) {
+            on(IRCMessage.Type.CHAN_MESSAGE, regex, callback);
+            on(IRCMessage.Type.PRIV_MESSAGE, regex, callback);
+            return;
+        }
+
         PatternMessageHandler handler = { callback, null, regex };
         if(type !in this.handlers) {
             this.handlers[type] = HandlerList([handler]);
@@ -103,6 +109,12 @@ public:
 
     void on(IRCMessage.Type type, Regex!char regex, MessageHandlerWithArgs callback)
     {
+        if(type == IRCMessage.Type.MESSAGE) {
+            on(IRCMessage.Type.CHAN_MESSAGE, regex, callback);
+            on(IRCMessage.Type.PRIV_MESSAGE, regex, callback);
+            return;
+        }
+
         PatternMessageHandler handler = { null, callback, regex };
         if(type !in this.handlers) {
             this.handlers[type] = HandlerList([handler]);

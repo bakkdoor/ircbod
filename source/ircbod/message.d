@@ -6,6 +6,7 @@ import ircbod.client;
 struct IRCMessage
 {
     enum Type {
+        MESSAGE,      // includes CHAN_MESSAGE & PIV_MESSAGE
         CHAN_MESSAGE,
         PRIV_MESSAGE,
         JOIN,
