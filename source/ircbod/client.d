@@ -22,6 +22,7 @@ private:
     string                          password;
     string[]                        channels;
     HandlerList[IRCMessage.Type]    handlers;
+    bool                            running;
 
     static Regex!char MATCHALL = regex(".*");
 
@@ -33,6 +34,7 @@ public:
         this.nickname = nickname;
         this.password = password;
         this.channels = channels;
+        this.running  = true;
     }
 
     string name() {
@@ -116,12 +118,22 @@ public:
             connect();
 
         string line;
-        while ((line = this.sock.read()).length > 0) {
+        while (this.running && (line = this.sock.read()).length > 0) {
             std.stdio.writeln(line);
             processLine(line);
         }
 
         this.sock.disconnect();
+    }
+
+    bool isRunning()
+    {
+        return this.running;
+    }
+
+    void quit()
+    {
+        this.running = false;
     }
 
     void sendMessageToChannel(string message, string channel)
