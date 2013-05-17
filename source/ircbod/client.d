@@ -158,6 +158,13 @@ public:
         this.sock.privmsg(nickname, message);
     }
 
+    void broadcast(string message)
+    {
+        foreach(c; this.channels) {
+            sendMessageToChannel(message, c);
+        }
+    }
+
 private:
 
     IRCMessage.Type typeForString(string typeStr)
