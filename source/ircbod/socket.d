@@ -1,6 +1,6 @@
 module ircbod.socket;
 
-import std.socket, std.socketstream, std.conv, std.string;
+import std.socket, std.socketstream, std.conv, std.string, std.array;
 import core.vararg;
 
 class IRCSocket
@@ -70,13 +70,13 @@ public:
         if (last) {
             args[$ - 1] = ":" ~ last;
         }
-        write(std.array.join(args, " "));
+        write(args.join(" "));
     }
 
     private void writeOptional(string command, string[] optional = [])
     {
         if(optional.length > 0) {
-            command ~= " " ~ std.array.join(optional, " ");
+            command ~= " " ~ optional.join(" ");
         }
         write(command.strip());
     }
@@ -93,7 +93,7 @@ public:
 
     void user(string username, uint mode, string unused, string realname)
     {
-        write("USER " ~ std.array.join([username, to!string(mode), unused, ":" ~ realname], " "));
+        write("USER " ~ [username, to!string(mode), unused, ":" ~ realname].join(" "));
     }
 
     void oper(string name, string password)
@@ -103,7 +103,7 @@ public:
 
     void mode(string channel, string[] modes)
     {
-        write("MODE " ~ channel ~ " " ~ std.array.join(modes, " "));
+        write("MODE " ~ channel ~ " " ~ modes.join(" "));
     }
 
     void quit(string message = null)
@@ -129,7 +129,7 @@ public:
     void names(string[] channels)
     {
         if(channels.length > 0)
-            write("NAMES " ~ std.array.join(channels, ","));
+            write("NAMES " ~ channels.join(","));
         else
             write("NAMES");
     }
@@ -137,7 +137,7 @@ public:
     void list(string[] channels)
     {
         if(channels.length > 0)
-            write("LIST " ~ std.array.join(channels, ","));
+            write("LIST " ~ channels.join(","));
         else
             write("LIST");
     }
@@ -229,6 +229,6 @@ public:
 
     void userhost(string[] users)
     {
-        write("USERHOST" ~ std.array.join(users, " "));
+        write("USERHOST" ~ users.join(" "));
     }
 }
