@@ -1,7 +1,6 @@
 module ircbod.socket;
 
-import std.socket, std.socketstream, std.conv, std.string, std.array;
-import core.vararg;
+import std.socket, std.socketstream, std.conv, std.string;
 
 class IRCSocket
 {
